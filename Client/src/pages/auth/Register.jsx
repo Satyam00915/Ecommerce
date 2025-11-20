@@ -3,7 +3,8 @@ import { registerFormControls } from "@/config";
 import { registerUser } from "@/store/auth-slice";
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 const initialState = {
   userName: "",
@@ -14,10 +15,20 @@ const initialState = {
 const Register = () => {
   const [formData, setFormData] = useState(initialState);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   function onSubmit(e) {
     e.preventDefault();
-    dispatch(registerUser(formData));
+    dispatch(registerUser(formData)).then((data) => {
+      if (data.payload.success) {
+        toast(data.payload.message);
+        navigate("/auth/login");
+      } else {
+        toast.warning (data.payload?.message);
+      }
+    });
   }
+
   return (
     <div className="mx-auto w-full max-w-md space-y-6">
       <div className="text-center">
