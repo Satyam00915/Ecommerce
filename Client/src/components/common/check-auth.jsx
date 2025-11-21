@@ -11,6 +11,7 @@ const CheckAuth = ({ isAuthenticated, user, children }) => {
       location.pathname.includes("/login")
     )
   ) {
+    console.log(location.pathname + "cc");
     return <Navigate to={"/auth/login"} />;
   }
 
@@ -22,6 +23,7 @@ const CheckAuth = ({ isAuthenticated, user, children }) => {
     if (user?.role === "admin") {
       return <Navigate to={"/admin/dashboard"} />;
     } else {
+      console.log("dd");
       return <Navigate to={"/shop/home"} />;
     }
   }

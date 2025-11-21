@@ -20,11 +20,12 @@ const Register = () => {
   function onSubmit(e) {
     e.preventDefault();
     dispatch(registerUser(formData)).then((data) => {
+      console.log(data);
       if (data.payload.success) {
         toast(data.payload.message);
         navigate("/auth/login");
       } else {
-        toast.warning (data.payload?.message);
+        toast.warning(data.payload?.message);
       }
     });
   }
