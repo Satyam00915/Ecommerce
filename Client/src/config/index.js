@@ -1,3 +1,5 @@
+import { LayoutDashboard, PackageSearch, ShoppingCart } from "lucide-react";
+
 export const registerFormControls = [
   {
     name: "userName",
@@ -36,5 +38,26 @@ export const loginFormControls = [
     placeholder: "Enter your password",
     componentType: "input",
     type: "password",
+  },
+];
+
+export const adminSidebarMenuItems = [
+  {
+    id: "dashboard",
+    label: "Dashboard",
+    path: "/admin/dashboard",
+    icon: LayoutDashboard,
+  },
+  {
+    id: "products",
+    label: "Products",
+    path: "/admin/products",
+    icon: ShoppingCart,
+  },
+  {
+    id: "orders",
+    label: "Orders",
+    path: "/admin/orders",
+    icon: PackageSearch,
   },
 ];
