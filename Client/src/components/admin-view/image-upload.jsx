@@ -10,6 +10,7 @@ export default function ProductImageUpload({
   file,
   setFile,
   uploadedImageUrl,
+  isEditMode,
   setUploadedImageUrl,
   setImageLoading,
   imageLoading,
@@ -53,7 +54,6 @@ export default function ProductImageUpload({
       }
     } catch (error) {
       toast.error("Image not uploaded!");
-      console.log("SSsS");
       setFile(null);
       inputRef.current.value = null;
       console.log(error);
@@ -77,13 +77,16 @@ export default function ProductImageUpload({
           ref={inputRef}
           onChange={handleImageFileChange}
           id="image-upload"
+          disabled={isEditMode}
           type={"file"}
           className={"hidden"}
         />
         {!file ? (
           <Label
             htmlFor="image-upload"
-            className="flex flex-col items-center justify-center h-32 cursor-pointer"
+            className={`flex flex-col items-center justify-center h-32 ${
+              isEditMode ? "cursor-not-allowed" : "cursor-pointer"
+            }`}
           >
             <UploadCloudIcon className="w-10 h-10 text-muted-foreground mb-2" />
             <span>Drag & Drop or Click to upload</span>

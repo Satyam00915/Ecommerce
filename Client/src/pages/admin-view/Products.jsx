@@ -1,4 +1,5 @@
 import ProductImageUpload from "@/components/admin-view/image-upload";
+import AdminProductTile from "@/components/admin-view/product-tile";
 import CommonForm from "@/components/common/form";
 import { Button } from "@/components/ui/button";
 import {
@@ -8,7 +9,10 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { addProductFormElements } from "@/config";
-import React, { Fragment, useState } from "react";
+import { addNewProduct, fetchAllProduct } from "@/store/admin/product-slice";
+import React, { Fragment, useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { toast } from "sonner";
 
 const initialFormData = {
   image: null,
@@ -27,8 +31,32 @@ const Products = () => {
   const [imageFile, setImageFile] = useState(null);
   const [uploadedImageUrl, setUploadedImageUrl] = useState("");
   const [imageloading, setImageLoading] = useState(false);
+  const { productList } = useSelector((state) => state.adminProducts);
+  const [currentEditedId, setCurrentEditedId] = useState(null);
 
-  function onSubmit() {}
+  const dispatch = useDispatch();
+  function onSubmit(e) {
+    e.preventDefault();
+    dispatch(
+      addNewProduct({
+        ...formData,
+        image: uploadedImageUrl,
+      })
+    ).then((data) => {
+      if (data?.payload?.success) {
+        setImageFile(null);
+        setFormData(initialFormData);
+        dispatch(fetchAllProduct());
+        setOpenCreateProductDialog(false);
+        toast.success(data.payload.message);
+      }
+    });
+  }
+
+  useEffect(() => {
+    dispatch(fetchAllProduct());
+  }, [dispatch]);
+
   return (
     <Fragment>
       <div className="mb-5 w-full flex justify-end">
@@ -36,16 +64,32 @@ const Products = () => {
           Add New Product
         </Button>
       </div>
-      <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4"></div>
+      <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4">
+        {productList && productList.length > 0
+          ? productList.map((productItem) => (
+              <AdminProductTile
+                setFormData={setFormData}
+                setOpenCreateProductDialog={setOpenCreateProductDialog}
+                setCurrentEditedId={setCurrentEditedId}
+                product={productItem}
+              />
+            ))
+          : null}
+      </div>
       <Sheet
         open={openCreateProductDialog}
-        onOpenChange={setOpenCreateProductDialog}
+        onOpenChange={() => {
+          setOpenCreateProductDialog(false);
+          setCurrentEditedId(null);
+          setFormData(initialFormData);
+        }}
       >
         <SheetContent side="right" className={"overflow-auto"}>
           <SheetHeader>
             <SheetTitle>Add New Product</SheetTitle>
           </SheetHeader>
           <ProductImageUpload
+            isEditMode={currentEditedId !== null}
             uploadedImageUrl={uploadedImageUrl}
             setUploadedImageUrl={setUploadedImageUrl}
             file={imageFile}
