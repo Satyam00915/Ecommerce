@@ -83,13 +83,16 @@ export const fetchProducts = async (req, res) => {
 //Edit Products
 export const editProduct = async (req, res) => {
   try {
+    const {
+      title,
+      description,
+      category,
+      brand,
+      price,
+      salePrice,
+      totalStock,
+    } = req.body;
     const { id } = req.params;
-    const cleanBody = {};
-    for (const key in req.body) {
-      if (req.body[key] != "") {
-        cleanBody[key] = req.body[key];
-      }
-    }
 
     const findProduct = await Product.findById(id);
     if (!findProduct) {
@@ -99,10 +102,19 @@ export const editProduct = async (req, res) => {
       });
     }
 
-    // new: true only the properties that have changed are changed rest are untouched
-    const updatedProduct = await Product.findByIdAndUpdate(id, cleanBody, {
-      new: true,
-    });
+    const updatedProduct = await Product.findByIdAndUpdate(
+      id,
+      {
+        title: title || findProduct.title,
+        description: description || findProduct.description,
+        category: category || findProduct.category,
+        brand: brand || findProduct.brand,
+        price: price || findProduct.price,
+        salePrice: salePrice || findProduct.salePrice,
+        totalStock: totalStock || findProduct.totalStock,
+      },
+      { new: true }
+    );
 
     res.status(200).json({
       success: true,
