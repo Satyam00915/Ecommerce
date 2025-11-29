@@ -44,10 +44,17 @@ export const fetchAllProduct = createAsyncThunk(
 
 export const editProduct = createAsyncThunk(
   "/product/edit",
-  async (id, { rejectWithValue }) => {
+  async ({ id, formData }, { rejectWithValue }) => {
     try {
+      console.log(formData);
       const result = await axios.put(
-        `http://localhost:5000/api/admin/products/edit/${id}`
+        `http://localhost:5000/api/admin/products/edit/${id}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
       );
       return result?.data;
     } catch (error) {
@@ -64,7 +71,7 @@ export const deleteProduct = createAsyncThunk(
         `http://localhost:5000/api/admin/products/delete/${id}`,
         {
           headers: {
-            withCredentials: true,
+            "Content-Type": "application/json",
           },
         }
       );

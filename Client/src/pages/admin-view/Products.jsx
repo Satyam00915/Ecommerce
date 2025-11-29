@@ -9,7 +9,12 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { addProductFormElements } from "@/config";
-import { addNewProduct, fetchAllProduct } from "@/store/admin/product-slice";
+import {
+  addNewProduct,
+  deleteProduct,
+  editProduct,
+  fetchAllProduct,
+} from "@/store/admin/product-slice";
 import React, { Fragment, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
@@ -37,18 +42,50 @@ const Products = () => {
   const dispatch = useDispatch();
   function onSubmit(e) {
     e.preventDefault();
-    dispatch(
-      addNewProduct({
-        ...formData,
-        image: uploadedImageUrl,
-      })
-    ).then((data) => {
+    currentEditedId !== null
+      ? dispatch(
+          editProduct({
+            id: currentEditedId,
+            formData,
+          })
+        ).then((data) => {
+          console.log(data);
+          if (data?.payload?.success) {
+            dispatch(fetchAllProduct());
+            setFormData(initialFormData);
+            setOpenCreateProductDialog(false);
+            setCurrentEditedId(null);
+            toast.success(data?.payload?.message);
+          }
+        })
+      : dispatch(
+          addNewProduct({
+            ...formData,
+            image: uploadedImageUrl,
+          })
+        ).then((data) => {
+          if (data?.payload?.success) {
+            setImageFile(null);
+            setFormData(initialFormData);
+            dispatch(fetchAllProduct());
+            setOpenCreateProductDialog(false);
+            toast.success(data.payload.message);
+          }
+        });
+  }
+
+  function isFormValid() {
+    return Object.keys(formData)
+      .map((key) => formData[key] !== "")
+      .every((item) => item);
+  }
+
+  function handleDelete(getCurrentId) {
+    console.log(getCurrentId);
+    dispatch(deleteProduct(getCurrentId)).then((data) => {
       if (data?.payload?.success) {
-        setImageFile(null);
-        setFormData(initialFormData);
         dispatch(fetchAllProduct());
-        setOpenCreateProductDialog(false);
-        toast.success(data.payload.message);
+        toast.success(data?.payload?.message);
       }
     });
   }
@@ -72,6 +109,7 @@ const Products = () => {
                 setOpenCreateProductDialog={setOpenCreateProductDialog}
                 setCurrentEditedId={setCurrentEditedId}
                 product={productItem}
+                handleDelete={handleDelete}
               />
             ))
           : null}
@@ -86,7 +124,9 @@ const Products = () => {
       >
         <SheetContent side="right" className={"overflow-auto"}>
           <SheetHeader>
-            <SheetTitle>Add New Product</SheetTitle>
+            <SheetTitle>
+              {currentEditedId !== null ? "Edit Product" : "Add Product"}
+            </SheetTitle>
           </SheetHeader>
           <ProductImageUpload
             isEditMode={currentEditedId !== null}
@@ -99,11 +139,12 @@ const Products = () => {
           />
           <div className="py-4 px-3 ">
             <CommonForm
+              isButtonDisabled={!isFormValid()}
               onSubmit={onSubmit}
               formData={formData}
               setFormData={setFormData}
               formControls={addProductFormElements}
-              buttonText={"Add Product"}
+              buttonText={currentEditedId !== null ? "Edit" : "Add"}
             />
           </div>
         </SheetContent>

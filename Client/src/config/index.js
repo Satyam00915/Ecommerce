@@ -94,6 +94,7 @@ export const addProductFormElements = [
     componentType: "select",
     options: [
       { id: "nike", label: "Nike" },
+      { id: "Microsoft", label: "Microsoft" },
       { id: "adidas", label: "Adidas" },
       { id: "puma", label: "Puma" },
       { id: "levi", label: "Levi's" },
